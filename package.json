@@ -4,32 +4,33 @@
  "description": "",
  "main": "app.js",
  "scripts": {
-   "test": "test",
-   "dev": "nodemon app.js",
-   "start": "nodemon app.js",
-   "lint": "npx eslint ."
+  "test": "test",
+  "dev": "nodemon app.js",
+  "start": "nodemon app.js",
+  "lint": "npx eslint ."
  },
  "repository": {
-   "type": "git",
-   "url": "git+https://github.com/AnastasiyaOvsyasha/movies-explorer-api.git"
+  "type": "git",
+  "url": "git+https://github.com/AnastasiyaOvsyasha/movies-explorer-api.git"
  },
  "keywords": [
-   "praktikum",
-   "movies"
+  "praktikum",
+  "movies"
  ],
  "author": "Anastasiya FE",
  "license": "ISC",
  "bugs": {
-   "url": "https://github.com/AnastasiyaOvsyasha/movies-explorer-api/issues"
+  "url": "https://github.com/AnastasiyaOvsyasha/movies-explorer-api/issues"
  },
  "homepage": "https://github.com/AnastasiyaOvsyasha/movies-explorer-api#readme",
  "devDependencies": {
-   "eslint": "^8.22.0",
-   "eslint-config-airbnb": "^19.0.4",
-   "eslint-plugin-import": "^2.26.0",
-   "nodemon": "^2.0.19"
+  "eslint": "^8.22.0",
+  "eslint-config-airbnb": "^19.0.4",
+  "eslint-plugin-import": "^2.26.0",
+  "nodemon": "^2.0.19"
  },
-  "dependencies": {
-    "express": "^4.18.1"
-  }
+ "dependencies": {
+  "express": "^4.18.1",
+  "mongoose": "^6.6.4"
+ }
 }
