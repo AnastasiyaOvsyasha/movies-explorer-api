@@ -7,12 +7,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { celebrate, Joi, errors } = require('celebrate');
-const auth = require('./middlewares/auth');
+const { errors } = require('celebrate');
+const router = require('./routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const {
-  createUser, login, logout,
+  logout,
 } = require('./controllers/users');
 
 const ErrorNotFound = require('./errors/ErrorNotFound');
@@ -38,44 +38,24 @@ const app = express();
 app.use(helmet());
 app.use(limiter);
 app.use(bodyParser.json());
+mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:27017/moviesdb');
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.get('/signout', logout);
 app.use(requestLogger);
+app.use(router);
+app.use(require('./routes/movies'));
+app.use(require('./routes/users'));
 
-app.post(
-  '/signin',
-  celebrate({
-    body: Joi.object().keys({
-      email: Joi.string().required().email(),
-      password: Joi.string().min(1).required(),
-    }),
-  }),
-  login,
-);
-app.post(
-  '/signup',
-  celebrate({
-    body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      email: Joi.string().required().email(),
-      password: Joi.string().min(1).required(),
-    }),
-  }),
-  createUser,
-);
-
-app.use(auth);
-app.use('/movie', require('./routes/movies'));
-app.use('/users', require('./routes/users'));
-
-app.use(errorLogger);
 app.use(errors());
 
 app.use('*', (req, res, next) => {
   next(new ErrorNotFound('Страница не найдена'));
 });
+
+app.use(errorLogger);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
@@ -83,8 +63,6 @@ app.use((err, req, res, next) => {
   res.status(statusCode).send({ message });
   next();
 });
-
-mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:27017/moviesdb');
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
