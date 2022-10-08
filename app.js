@@ -66,7 +66,7 @@ app.post(
 );
 
 app.use(auth);
-app.use('/movies', require('./routes/movies'));
+app.use('/movie', require('./routes/movies'));
 app.use('/users', require('./routes/users'));
 
 app.use(errorLogger);
