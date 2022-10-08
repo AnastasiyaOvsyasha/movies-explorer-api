@@ -12,7 +12,7 @@ const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const {
-  createUser, login,
+  createUser, login, logout,
 } = require('./controllers/users');
 
 const ErrorNotFound = require('./errors/ErrorNotFound');
@@ -41,6 +41,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
+app.get('/signout', logout);
 app.use(requestLogger);
 
 app.post(

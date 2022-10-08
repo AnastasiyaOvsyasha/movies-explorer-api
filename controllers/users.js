@@ -89,3 +89,10 @@ module.exports.login = (req, res, next) => {
       next(new AuthorizationError('Некорректно введены имя пользователя или пароль'));
     });
 };
+
+module.exports.logout = (req, res) => {
+  res.clearCookie('jwt');
+  res.send({
+    status: 'Выход выполнен',
+  });
+};
