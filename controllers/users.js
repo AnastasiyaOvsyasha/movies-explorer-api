@@ -80,7 +80,13 @@ module.exports.login = (req, res, next) => {
             NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
             { expiresIn: '7d' },
           );
-          res.status(200).send({ token });
+          res.cookie('jwt', token, {
+            maxAge: 3600000 * 24 * 7,
+            httpOnly: true,
+            sameSite: 'none',
+          });
+
+          res.send({ data: user.toJSON() });
         } else {
           next(new AuthorizationError('Некорректно введены имя пользователя или пароль'));
         }
