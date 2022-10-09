@@ -6,6 +6,7 @@ const ErrorNotFound = require('../errors/ErrorNotFound');
 const ErrorConflict = require('../errors/ErrorConflict');
 const AuthorizationError = require('../errors/AuthorizationError');
 const ErrorServer = require('../errors/ErrorServer');
+const ErrorBadRequest = require('../errors/ErrorBadRequest');
 
 module.exports.createUser = (req, res, next) => {
   const { name, email, password } = req.body;
@@ -35,19 +36,19 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
-  const token = req.cookies.jwt;
-  User.findById(req.user._id)
+  User.findById(req.user)
     .then((user) => {
       if (!user) {
-        next(new ErrorNotFound('Пользователь не найден'));
-      }
-      if (!token) {
-        next(new AuthorizationError('Jwt не найден'));
-      } else {
         res.send(user);
       }
+      next(new ErrorNotFound('Пользователь не найден'));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ErrorBadRequest('Id пользователя введён некорректно'));
+      }
+      next(new ErrorServer('Произошла ошибка'));
+    });
 };
 
 module.exports.updateUserProfile = (req, res, next) => {
