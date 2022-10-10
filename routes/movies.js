@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { celebrate, Joi } = require('celebrate');
-const { isURL } = require('validator');
+const validator = require('validator');
 const {
   getSavedMovies,
   createMovie,
@@ -21,36 +21,36 @@ movieRouter.post(
       year: Joi.number().required().min(1),
       description: Joi.string().required().min(1),
       image: Joi.string().required().custom((value, helpers) => {
-        if (isURL(value)) {
+        if (validator.isURL(value)) {
           return value;
         }
         return helpers.message('Поле image (url) заполнено некорректно');
       }),
       trailerLink: Joi.string().required().custom((value, helpers) => {
-        if (isURL(value)) {
+        if (validator.isURL(value)) {
           return value;
         }
         return helpers.message('Поле trailerLink (url) заполнено некорректно');
       }),
       thumbnail: Joi.string().required().custom((value, helpers) => {
-        if (isURL(value)) {
+        if (validator.isURL(value)) {
           return value;
         }
         return helpers.message('Поле thumbnail (url) заполнено некорректно (не соответствует формату URL)');
       }),
-      movieId: Joi.string().required().min(1),
-      nameRU: Joi.string().required().min(1),
-      nameEN: Joi.string().required().min(1),
+      movieId: Joi.number().required(),
+      nameRU: Joi.string().required(),
+      nameEN: Joi.string().required(),
     }),
   }),
   createMovie,
 );
 
 movieRouter.delete(
-  '/:id',
+  '/movies/:id',
   celebrate({
     params: Joi.object().keys({
-      movieId: Joi.string().hex().length(24),
+      id: Joi.string().hex().required().length(24),
     }),
   }),
   deleteMovieById,

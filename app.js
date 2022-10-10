@@ -8,14 +8,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
-const router = require('./routes');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-
-const {
-  logout,
-} = require('./controllers/users');
-
-const ErrorNotFound = require('./errors/ErrorNotFound');
 
 const { PORT = 3001, NODE_ENV, DB_CONN } = process.env;
 
@@ -43,19 +36,13 @@ mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:2701
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
-app.get('/signout', logout);
 app.use(requestLogger);
-app.use(router);
-app.use(require('./routes/movies'));
-app.use(require('./routes/users'));
 
-app.use(errors());
-
-app.use('*', (req, res, next) => {
-  next(new ErrorNotFound('Страница не найдена'));
-});
+app.use(require('./routes'));
 
 app.use(errorLogger);
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
