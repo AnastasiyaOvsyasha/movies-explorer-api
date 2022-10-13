@@ -16,7 +16,7 @@ router.post(
           if (validator.isEmail(value)) {
             return value;
           }
-          return helpers.message('Поле email заполнено некорректно');
+          return helpers.message('Email введен неправильно');
         }),
     }),
   }),
@@ -35,7 +35,7 @@ router.post(
           if (validator.isEmail(value)) {
             return value;
           }
-          return helpers.message('Поле email заполнено некорректно');
+          return helpers.message('Email введен неверно');
         }),
     }),
   }),

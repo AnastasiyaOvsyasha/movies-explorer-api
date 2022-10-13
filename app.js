@@ -35,7 +35,6 @@ mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:2701
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(helmet());
 app.use(requestLogger);
 
 app.use(require('./routes'));

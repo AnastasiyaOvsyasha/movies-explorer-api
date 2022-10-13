@@ -36,7 +36,7 @@ movieRouter.post(
         if (validator.isURL(value)) {
           return value;
         }
-        return helpers.message('Поле thumbnail (url) заполнено некорректно (не соответствует формату URL)');
+        return helpers.message('Поле thumbnail (url) заполнено некорректно');
       }),
       movieId: Joi.number().required(),
       nameRU: Joi.string().required(),
