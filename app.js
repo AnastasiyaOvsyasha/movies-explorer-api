@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 require('dotenv').config();
-// const cors = require('cors');
+const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const { PORT = 3001, NODE_ENV, DB_CONN } = process.env;
+const { PORT = 4000, NODE_ENV, DB_CONN } = process.env;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -19,19 +19,22 @@ const limiter = rateLimit({
 
 const app = express();
 
-// app.use(
-// cors({
-// origin: [
-// 'http://localhost:3000',
-// ],
-// credentials: true,
-// }),
-// );
+app.use(
+  cors({
+    origin: ['http://localhost:4000',
+      // 'https//diploma.praktikum.nomoredomains.icu',
+      // 'http//diploma.praktikum.nomoredomains.icu'
+    ],
+    credentials: true,
+  }),
+);
 
 app.use(helmet());
 app.use(limiter);
 app.use(bodyParser.json());
-mongoose.connect(NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:27017/moviesdb');
+mongoose.connect(
+  NODE_ENV === 'production' ? DB_CONN : 'mongodb://localhost:27017/moviesdb',
+);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
