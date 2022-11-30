@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
-const { getCurrentUser, updateUserProfile } = require('../controllers/users');
+const { getCurrentUser, updateUserInfo } = require('../controllers/users');
 
 const userRouter = Router();
 
@@ -21,7 +21,7 @@ userRouter.patch(
     }),
   }),
 
-  updateUserProfile,
+  updateUserInfo,
 );
 
 module.exports = userRouter;
