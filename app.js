@@ -22,8 +22,8 @@ const app = express();
 app.use(
   cors({
     origin: ['http://localhost:3000',
-      // 'https//diploma.praktikum.nomoredomains.icu',
-      // 'http//diploma.praktikum.nomoredomains.icu'
+      // 'https://diploma.praktikum.nomoredomains.icu',
+      // 'http://diploma.praktikum.nomoredomains.icu',
     ],
     credentials: true,
   }),
