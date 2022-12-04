@@ -1,0 +1,24 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# misc
+.DS_Store
+.idea
+.vscode
+
+.editorconfig
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directory
+node_modules
+build
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.vscode
+.env
