@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 require('dotenv').config();
-const cors = require('cors');
+//const cors = require('cors');
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -19,15 +19,15 @@ const limiter = rateLimit({
 
 const app = express();
 
-app.use(
-  cors({
-    origin: ['http://localhost:3000',
+//app.use(
+  //cors({
+    //origin: ['http://localhost:3000',
       // 'https://diploma.praktikum.nomoredomains.icu',
       // 'http://diploma.praktikum.nomoredomains.icu',
-    ],
-    credentials: true,
-  }),
-);
+    //],
+    //credentials: true,
+  //}),
+//);
 
 app.use(helmet());
 app.use(limiter);
