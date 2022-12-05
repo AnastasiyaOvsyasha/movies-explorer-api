@@ -90,7 +90,7 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : JWT_PRODUCTION_KEY, { expiresIn: '7d' });
       res.cookie('authorization', token, {
-        maxAge: 3600000 * 24 * 7, httpOnly: true, secure: true, sameSite: 'none', domain: 'localhost',
+        maxAge: 3600000 * 24 * 7, httpOnly: true, secure: true, sameSite: 'none', domain: 'diploma.praktikum.nomoredomains.icu',
       }).send({ message: 'Athorization successful' });
     })
     .catch(next);
