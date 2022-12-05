@@ -1,6 +1,6 @@
-const { Schema, Types, model } = require('mongoose');
+const mongoose = require('mongoose');
 
-const movieSchema = new Schema({
+const cardSchema = new mongoose.Schema({
   country: {
     type: String,
     required: true,
@@ -23,35 +23,47 @@ const movieSchema = new Schema({
   },
   image: {
     type: String,
-    validate: {
-      validator: (v) => /(https?:\/\/(([\w-]+\.)+)+([\w])+((\/[a-z_0-9\-:~\\.%\\/?#[\]@!$&'\\(\\)*+,;=]+)+)?)/g.test(v),
-      message: (props) => `${props.value} — ссылка не валидна!`,
-    },
     required: true,
+    validate: {
+      validator(v) {
+        return /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(
+          v,
+        );
+      },
+      message: (props) => `${props.value} ссылка невалидна`,
+    },
   },
   trailerLink: {
     type: String,
-    validate: {
-      validator: (v) => /(https?:\/\/(([\w-]+\.)+)+([\w])+((\/[a-z_0-9\-:~\\.%\\/?#[\]@!$&'\\(\\)*+,;=]+)+)?)/g.test(v),
-      message: (props) => `${props.value} — ссылка не валидна!`,
-    },
     required: true,
+    validate: {
+      validator(v) {
+        return /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(
+          v,
+        );
+      },
+      message: (props) => `${props.value} ссылка невалидна`,
+    },
   },
   thumbnail: {
     type: String,
-    validate: {
-      validator: (v) => /(https?:\/\/(([\w-]+\.)+)+([\w])+((\/[a-z_0-9\-:~\\.%\\/?#[\]@!$&'\\(\\)*+,;=]+)+)?)/g.test(v),
-      message: (props) => `${props.value} — ссылка на миниатюру постера фильма не валидна!`,
-    },
     required: true,
+    validate: {
+      validator(v) {
+        return /(?:https?):\/\/(\w+:?\w*)?(\S+)(:\d+)?(\/|\/([\w#!:.?+=&%!\-/]))?/.test(
+          v,
+        );
+      },
+      message: (props) => `${props.value} ссылка невалидна`,
+    },
   },
   owner: {
-    type: Types.ObjectId,
-    ref: 'user',
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: 'user',
   },
   movieId: {
-    type: Number,
+    type: String,
     required: true,
   },
   nameRU: {
@@ -64,4 +76,4 @@ const movieSchema = new Schema({
   },
 });
 
-module.exports = model('movie', movieSchema);
+module.exports = mongoose.model('movie', cardSchema);

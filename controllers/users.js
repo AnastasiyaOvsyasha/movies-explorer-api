@@ -1,104 +1,102 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/users');
-
-const ErrorNotFound = require('../errors/ErrorNotFound');
+const ErrorBadRequest = require('../errors/ErrorBadRequest');
 const ErrorConflict = require('../errors/ErrorConflict');
-const AuthorizationError = require('../errors/AuthorizationError');
-const ErrorServer = require('../errors/ErrorServer');
+const ErrorNotFound = require('../errors/ErrorNotFound');
+const { JWT_PRODUCTION_KEY } = require('../utils/config');
 
-module.exports.createUser = (req, res, next) => {
-  const { name, email, password } = req.body;
-  bcrypt.hash(password, 10).then((hash) => {
-    User.create({
-      name,
-      email,
-      password: hash,
-    })
-      .then((user) => res.status(200).send({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-      }))
-      .catch((err) => {
-        if (err.code === 11000) {
-          return next(new ErrorConflict('Данный email уже зарегестрирован'));
-        }
-        return next(new ErrorServer('Ошибка на сервере'));
-      });
-  });
-};
+const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.getCurrentUser = (req, res, next) => {
+const {
+  STATUS_CREATED,
+} = require('../utils/constants');
+
+module.exports.getUserInfo = (req, res, next) => {
   const { _id } = req.user;
-  User.findById(_id)
-    .then((user) => {
-      if (!user) {
-        throw new ErrorNotFound('Пользователь не найден');
-      }
-      res.send(user);
-    })
+
+  User.find({ _id })
+    .then((user) => res.send({ data: user[0] }))
     .catch(next);
 };
 
-module.exports.updateUserInfo = (req, res, next) => {
+module.exports.createUser = (req, res, next) => {
+  const {
+    name, email, password,
+  } = req.body;
+
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create(
+      {
+        name, email, password: hash,
+      },
+    ))
+    .then((user) => {
+      const userWithOutPassword = user.toObject();
+      delete userWithOutPassword.password;
+      res.status(STATUS_CREATED).send(userWithOutPassword);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ErrorBadRequest(err.message));
+        return;
+      }
+      if (err.code === 11000) {
+        next(new ErrorConflict(`User with email ${email} already exist`));
+        return;
+      }
+      next(err);
+    });
+};
+
+module.exports.updateUser = (req, res, next) => {
+  const userId = req.user._id;
   const { name, email } = req.body;
   User.findByIdAndUpdate(
-    req.user._id,
+    userId,
     { name, email },
-    { new: true, runValidators: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
     .then((user) => {
       if (!user) {
-        throw new ErrorNotFound('Пользователь не найден');
+        throw new ErrorNotFound(`User ID ${userId} is not found`);
       }
-      res.send(user);
+      res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ErrorBadRequest('Invalid data passed when updating profile'));
+        return;
+      }
+      if (err.code === 11000) {
+        next(new ErrorConflict(`User with email ${email} already exist`));
+        return;
+      }
+      if (err.name === 'CastError') {
+        next(new ErrorBadRequest('User ID is incorrect'));
+        return;
+      }
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
-    .select('+password')
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const { NODE_ENV, JWT_SECRET } = process.env;
-      bcrypt.compare(password, user.password, (error, result) => {
-        if (result) {
-          const token = jwt.sign(
-            { _id: user._id },
-            NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
-            { expiresIn: '7d' },
-          );
-          res.cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7,
-            httpOnly: true,
-            sameSite: 'none',
-            secure: 'true',
-          });
-          res.send({ data: user.toJSON() });
-        } else {
-          next(
-            new AuthorizationError(
-              'Некорректно введены имя пользователя или пароль',
-            ),
-          );
-        }
-      });
+      const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : JWT_PRODUCTION_KEY, { expiresIn: '7d' });
+      res.cookie('authorization', token, {
+        maxAge: 3600000 * 24 * 7, httpOnly: true, secure: true, sameSite: 'none', domain: 'localhost',
+      }).send({ message: 'Athorization successful' });
     })
-    .catch(() => {
-      next(
-        new AuthorizationError(
-          'Некорректно введены имя пользователя или пароль',
-        ),
-      );
-    });
+    .catch(next);
 };
 
-module.exports.logout = (req, res) => {
-  res.clearCookie('jwt');
-  res.send({
-    status: 'Выход выполнен',
-  });
+module.exports.signout = (req, res) => {
+  const userId = req.user._id;
+  res.clearCookie('authorization', { secure: true, sameSite: 'none' }).send({ message: `Signout user ${userId} is successful` });
 };
