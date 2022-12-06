@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
@@ -13,7 +14,7 @@ const { handleError } = require('./utils/handleError');
 const { limiter } = require('./utils/rateLimiter');
 const { MONGO_DEV_URL } = require('./utils/config');
 
-const { PORT = 4000, NODE_ENV, MONGO_PROD_URL } = process.env;
+const { PORT = 3000, NODE_ENV, MONGO_PROD_URL } = process.env;
 
 const app = express();
 
